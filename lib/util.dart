@@ -1,7 +1,7 @@
 const biananceP2PBase =
     "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search";
 const currencyApiBase = "https://api.currencyapi.com/v3/latest";
-const apikey = "";
+const apikey = "sgiPfh4j3aXFR3l2CnjWqdKQzxpqGn9pX5b3CUsz";
 const baseCurrency = "USD";
 const currencies = "EUR,CNY,THB,MYR,JPY,SGD";
 const biananceP2PPostData = {

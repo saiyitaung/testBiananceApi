@@ -4,6 +4,7 @@
         android:label="cexl"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDrHKl8IxB4cGXIoELXQOzzZwiH1xtsRf4"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -8,8 +8,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 part 'my_providers.g.dart';
 
-
-
 @Riverpod(keepAlive: true)
 Dio client(ClientRef ref) {
   return Dio();
@@ -18,6 +16,7 @@ Dio client(ClientRef ref) {
 @riverpod
 Future<List<CurrencyModel>> currentMMKExchange(
     CurrentMMKExchangeRef ref) async {
+    
   final resp = await ref.read(clientProvider).get(
       "$currencyApiBase?base=$baseCurrency&currencies=$currencies",
       options: Options(headers: {"apikey": apikey}));

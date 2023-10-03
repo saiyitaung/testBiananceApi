@@ -1,5 +1,5 @@
 import 'package:cexl/crypto_exchange_page.dart';
-import 'package:cexl/model.dart';
+import 'package:cexl/example_page.dart';
 import 'package:cexl/my_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -59,6 +59,16 @@ class HomePage extends ConsumerWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const CryptoExchangeRateDemo(),
+                    ));
+              },
+            ),
+            ListTile(
+              title: const Text("Example page"),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ExamplePage(),
                     ));
               },
             )
