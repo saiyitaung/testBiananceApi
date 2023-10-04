@@ -22,9 +22,31 @@ final myNotifierProvider =
 
 class MyNotifier extends ChangeNotifier {
   GoogleMapController? controller;
+  LatLng? selected;
+  final locations = [
+    const LatLng(16.782696, 96.161982),
+    const LatLng(16.822956, 96.162953),
+    const LatLng(16.832153, 96.189191),
+    const LatLng(16.818402, 96.138111),
+    const LatLng(17.0535, 96.30624),
+    const LatLng(17.03207, 96.30176),
+    const LatLng(17.03111, 96.30157),
+    const LatLng(
+      17.03024,
+      96.30146,
+    ),
+    const LatLng(17.02741, 96.30112)
+  ];
 
   setCtrl(GoogleMapController c) {
     controller = c;
+    notifyListeners();
+  }
+
+  setSelcted(LatLng l) {
+    selected = l;
+    moveTo(selected!);
+    notifyListeners();
   }
 
   moveTo(LatLng l) {
@@ -42,25 +64,21 @@ class MyNotifier extends ChangeNotifier {
 }
 
 GlobalKey<ScaffoldState> scaffoldState = GlobalKey<ScaffoldState>();
-final locations = [
-  const LatLng(16.782696, 96.161982),
-  const LatLng(16.822956, 96.162953),
-  const LatLng(16.832153, 96.189191),
-  const LatLng(16.818402, 96.138111),
-  const LatLng(16.802103, 96.175357)
-];
 
 class ExamplePage extends HookConsumerWidget {
   const ExamplePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(exampleStateProvider);
+    final _ = ref.watch(exampleStateProvider);
     final locationAnimation = useAnimationController(
         initialValue: 1, duration: const Duration(milliseconds: 1000));
     final menuIconAniCtl = useAnimationController(
         initialValue: 0, duration: const Duration(milliseconds: 700));
-    final myNotifier = ref.watch(myNotifierProvider);
+    ref.listen(
+        myNotifierProvider.select((value) => value.controller), (pre, nex) {});
+    final prRef = ref.read(myNotifierProvider);
+    print("Rebuld Example page ....");
     return Scaffold(
       key: scaffoldState,
       drawerScrimColor: Colors.transparent,
@@ -69,7 +87,7 @@ class ExamplePage extends HookConsumerWidget {
           SizedBox.expand(
             child: GoogleMap(
               onMapCreated: (c) {
-                myNotifier.setCtrl(c);
+                prRef.setCtrl(c);
               },
               initialCameraPosition: const CameraPosition(
                   target: LatLng(16.837591, 96.172914), zoom: 15),
@@ -87,44 +105,100 @@ class ExamplePage extends HookConsumerWidget {
         ],
       ),
       drawer: Drawer(
-        width: MediaQuery.of(context).size.width * .45,
+        width: MediaQuery.of(context).size.width * .5,
         shape: const RoundedRectangleBorder(),
-        child: Container(
-          height: double.infinity,
-          width: double.infinity,
-          color: const Color(0xff252525),
-          child: Column(
-            children: [
-              Container(
-                height: 150,
+        child: Consumer(
+          builder: (_, WidgetRef ref, __) {
+            final pref = ref.watch(myNotifierProvider);
+            print("rebuild drawler");
+            return Container(
+              height: double.infinity,
+              width: double.infinity,
+              color: Colors.white,
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Center(
+                    child: Text(
+                      "YBS 11",
+                      style: TextStyle(
+                          fontSize: 30,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const Row(
+                    children: [],
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        return TimelineTile(
+                          indicatorStyle: IndicatorStyle(
+                              padding: const EdgeInsets.only(left: 8),
+                              width: 30,
+                              height: 40,
+                              indicator: Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.black,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.bus_alert_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              )),
+                          alignment: TimelineAlign.start,
+                          endChild: InkWell(
+                            onTap: () {
+                              pref.setSelcted(pref.locations[index]);
+                            },
+                            child: SizedBox(
+                                height: 60,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 10,
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Gate Haung',
+                                        style: TextStyle(
+                                            color: pref.locations[index] ==
+                                                    pref.selected
+                                                ? Colors.green
+                                                : Colors.black),
+                                      ),
+                                      Text(
+                                        'Bo Hmu Ba Htoo Road',
+                                        style: TextStyle(
+                                            color: pref.locations[index] ==
+                                                    pref.selected
+                                                ? Colors.green
+                                                : Colors.black,
+                                            fontSize: 11),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ),
+                          isFirst: index == 0,
+                          isLast: index == pref.locations.length - 1,
+                        );
+                      },
+                      itemCount: pref.locations.length,
+                    ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: ListView.builder(
-                  itemBuilder: (context, index) {
-                    return TimelineTile(
-                      alignment: TimelineAlign.start,
-                      endChild: InkWell(
-                        onTap: () {
-                          myNotifier.moveTo(locations[index]);
-                        },
-                        child: SizedBox(
-                            height: 80,
-                            child: Center(
-                              child: Text(
-                                'Demo $index',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            )),
-                      ),
-                      isFirst: index == 0,
-                      isLast: index == locations.length - 1,
-                    );
-                  },
-                  itemCount: locations.length,
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
